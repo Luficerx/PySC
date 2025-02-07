@@ -1,8 +1,8 @@
-import re
-
+from pathlib import Path
 from typing import Any
 from .pattern import *
 from .log import *
+import re
 
 class PySCScope():
     def __init__(self, *args, **kwargs):
@@ -28,7 +28,7 @@ def PySCSplit(pattern: str, line: str, repl: tuple[str, str] | None = None) -> l
         
     return re.split(pattern, line)
 
-def PySCHandleFileFormat(file_name: str) -> str:
+def PySCHandleInputFile(file_name: str) -> str:
     if file_name.endswith(".json"):
         msg = "Bruh, Why the fuck you're trying to parse a json file?"
         raise PySCFileException(msg)
@@ -37,59 +37,61 @@ def PySCHandleFileFormat(file_name: str) -> str:
         msg = "Invalid file format: {}".format(file_name)
         raise PySCFileException(msg)
 
+    if not Path(file_name).exists():
+        file_path = Path.cwd() / file_name
+        msg = "Could not find file: {}".format(file_path)
+        raise PySCFileException(msg)
+
     return file_name
 
-def PySCParseBlocks(items: list[str]) -> Any:
-    pass
-
-def PySCOpen(file_name: str) -> list[Any]:
-    LOG("PARSING", file_name)
-
-    file_name = PySCHandleFileFormat(file_name)
+def PySCParseBlocks(file_name: str) -> Any:
+    skip = False
     blocks = []
     block = []
     pos = 0
-    skip = False
-
+    
     with open(file_name, "r") as fl:
-        for i, line in enumerate([line.strip() for line in fl.readlines() if line.strip()]):
+        lines = [(x, y) for (x, y) in enumerate(fl.readlines(), start=1) if y.strip()]
+
+        for i, line in lines:
             pos += PySCGetPos(line)
 
-            # FIXME: PySCStripComment matches closing embbed comments.
-            # ignores <# but matches #> 
-            # It's underfined behavior, quick fix is parse embbed comments before simple comments
-
-            if skip:
-                if PySCComment(PySCCloseComment, line):
-                    skip = False
+            if PySCComment(PySCSimpleComment, line):
                 continue
+
+            line = PySCStripComment(line)
+            line = PySCStripEmbbedComment(line)
 
             if PySCComment(PySCOpenComment, line):
                 skip = True
                 continue
 
-            line = PySCStripEmbbedComment(line)
+            if skip:
+                if PySCComment(PySCCloseComment, line):
+                    skip = False
 
-            if not skip:
-                line = PySCStripComment(line)
+                if PySCComment(PySCOpenComment, line):
+                    WARN(f"'<#' Found in line {i} inside a comment section, Did you forget to close the previous comment block?", file_name, i)
 
-            # Skips lines that are emtpy
-            if not line.strip():
                 continue
 
-            if PySCComment(PySCSimpleComment, line):
-                continue
-            
             block.append(line)
 
             if pos == 0 and block:
-                result = "".join(block)
-                blocks.append(result)
+                naked = "".join(block)
+                blocks.append(naked)
                 block = []
+
+        if skip:
+            raise PySCCommentException("Reached EOF and '#>' could not be found.")
     
-    with open("output.txt", "w") as fl:
-        for item in blocks:
-            fl.write(f"{item}\n")
+    return blocks
+
+def PySCOpen(file_name: str) -> list[Any]:
+    LOG("PARSING", file_name)
+    PySCHandleInputFile(file_name)
+    blocks = PySCParseBlocks(file_name)
+    return blocks
 
 def PySCGetPos(line: str) -> int:
     return sum([line.count(x) for x in PySCOpenDelims]) - sum([line.count(y) for y in PySCCloseDelims])

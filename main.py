@@ -1,15 +1,31 @@
+import sys
+
 from pysc.pysc import PySCOpen
 from pysc.log import LOG
+import pysc.util as util
 
 def main():
-    LOG("START", "PySC")
-    PySCOpen("input.pysc")
+    result = util.PySCCMDResult(sys.argv[:])
     
-    # with open("output.txt", "w") as fl:
-    #     for line in PySCOpen("config.pysc"):
-    #         fl.write(line):
+    if util.PySCCMDFailure(result):
+        return
 
-    LOG("OUTPUT", "output.txt")
+    input, output = result
+
+    if input:
+        LOG("START", "PySC")
+
+        blocks = PySCOpen(input)
+    
+    if output and input:
+        with open(output, "w") as fl:
+            for line in blocks:
+                fl.write(line)
+
+        LOG("OUTPUT", output)
+
+        print("[DONE]")
+        return
 
 if __name__ == "__main__":
     main()

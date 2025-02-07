@@ -1,30 +1,42 @@
-[10, 20, 30],                <# THIS IS AN EMBBED COMMENT THAT IS SUPPOSED TO BE STRIPPED OFF #>                   [40, 50, 60]                     
-               # THIS IS A SIMPLE COMMENT
-               # THIS SHOULD BE IGNORED.
-[]             # THIS IS AN COMPOSED COMMENT
-()             # THIS SHOULD BE STRIPPED OFF.
+<#
+This is a very bad example of trying to parse this
+Because It's mostly copy pasted version of the same
+Lines because I can't bother to write thousands
+Of thousands of lines.
+#>
 
+([10, 20, 30, 50], <#This should be stripped off#> [60, 80, 90, 999])
 
-<# This is a multi-comment
-section where everything in
-between these tags should be
-ignored #>
+# Comments to be ignored
+        # More comments to be ignored
 
-{"Foo": True}
-
-{
-    "True": False,
-    "Foo": [1, 5, 9],
-    (0, 0): {
-        "Foo",
-        "Boo",
-        "Baz"
-    },
-    <#
-    "AAA": "BBB",
-    #>
-    # This should be ignored
-    "Has": "Comment", # This should be removed.
-
-    "Fruit": [1, 2, 3, <#This is very stupid.#> 4, 5, 6]
+{   # This entire test is to see if this is parsed properly
+    # By removing the comments and keeping the current section of code intact/complete in a single line
+    "A few nested structures": [
+        10, 50, 100,
+        (
+            "Foo", "Boo", "Baz",
+        ),
+        {
+            "More nesting":
+            {
+                "Because why not?": None
+            }
+        },
+        <#
+        {
+            "But this one": "Should not be part of the code"
+        }
+        #>
+        {
+            "But this one": "Should be part"
+        }
+    ]
 }
+[
+    12, ["Why not?"],
+    13, ("Because at the end of the day",),
+    14, {"These should be just parsed lines/blocks"},
+    15,
+    16,
+]
