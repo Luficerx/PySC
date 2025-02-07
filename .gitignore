@@ -1,0 +1,6 @@
+# Ignore Folders
+**/__pycache__/
+/.vscode/
+
+# Tests not included because it's old parsing syntax;
+**/tests/

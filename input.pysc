@@ -1,0 +1,30 @@
+[10, 20, 30],                <# THIS IS AN EMBBED COMMENT THAT IS SUPPOSED TO BE STRIPPED OFF #>                   [40, 50, 60]                     
+               # THIS IS A SIMPLE COMMENT
+               # THIS SHOULD BE IGNORED.
+[]             # THIS IS AN COMPOSED COMMENT
+()             # THIS SHOULD BE STRIPPED OFF.
+
+
+<# This is a multi-comment
+section where everything in
+between these tags should be
+ignored #>
+
+{"Foo": True}
+
+{
+    "True": False,
+    "Foo": [1, 5, 9],
+    (0, 0): {
+        "Foo",
+        "Boo",
+        "Baz"
+    },
+    <#
+    "AAA": "BBB",
+    #>
+    # This should be ignored
+    "Has": "Comment", # This should be removed.
+
+    "Fruit": [1, 2, 3, <#This is very stupid.#> 4, 5, 6]
+}
