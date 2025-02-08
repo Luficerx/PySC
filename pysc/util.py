@@ -1,6 +1,6 @@
 import os
 from typing import overload, Any
-from .log import LOG, PySCLogs
+from .log import PySCLogs
 
 PySCOutput = "-o : Output File\nex: my_output.pysc | my_output.txt | my_output.py"
 PySCInput = "-i : Input File\nex: my_input.pysc"
@@ -26,7 +26,7 @@ PySCErrorInfo = ""
 PySCErrorMessages = {
     PySCCMDEmtpy: "[ERROR] No flags provided\n[HINT] consider using -h to check available flags.",
     PySCTestFileError: "Could not find test file:",
-    PySCCMDError: "[ERROR]",
+    PySCCMDError: "[ERROR] {}",
     }
 
 @overload
@@ -44,7 +44,7 @@ def PySCCMDResult(args: list):
     
     while args:
         if args[0] == "-h":
-            print(PySCHelp)
+            PySCBlockPrinter(PySCHelp)
             break
         
         arg = args.pop(0)
@@ -64,7 +64,7 @@ def PySCCMDResult(args: list):
                 return PySCCMDError
             
             if (cmd := PySCHelpCmds.get(f"{arg} {argc}", False)):
-                PySCLogs(cmd)
+                PySCBlockPrinter(cmd)
                 return PySCCMDInfo
             
             if arg == "-i":
@@ -84,7 +84,7 @@ def PySCCMDResult(args: list):
                     PySCErrorInfo = f"{input}."
                     return PySCTestFileError
                 
-                LOG("TESTING", input)
+                PySCLogs("[TESTING]", input)
             
         else:
             PySCErrorInfo = f"Unrecognized flag '{arg}', use -h for help."
@@ -100,7 +100,24 @@ def PySCCMDFailure(result: int) -> bool:
         return True
     
     if result in PySCErrorMessages:
-        PySCLogs(PySCErrorMessages.get(result), PySCErrorInfo)
+        msg = PySCErrorMessages.get(result)
+        PySCBlockPrinter(msg, PySCErrorInfo)
         return True
     
     return False
+
+def PySCBlockPrinter(text: str, fmt: str = None):
+    if fmt:
+        text = text.format(fmt)
+
+    lines = text.split("\n")
+    n = len(sorted(lines, key=lambda obj: len(obj), reverse=True)[0])
+
+    print("")
+    print("█", "▀" * (n + 2), "█", sep="")
+    
+    for line in lines:
+        space = " " * (n - len(line))
+        print("█ ", line, space + " █", sep="")
+
+    print("█", "▄" * (n + 2), "█", sep="")

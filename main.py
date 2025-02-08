@@ -1,7 +1,7 @@
 import sys
 
 from pysc.pysc import PySCOpen
-from pysc.log import LOG
+from pysc.log import PySCLogs
 import pysc.util as util
 
 def main():
@@ -13,7 +13,7 @@ def main():
     input, output = result
 
     if input:
-        LOG("START", "PySC")
+        PySCLogs("[START]", "PySC")
 
         blocks = PySCOpen(input)
     
@@ -22,7 +22,7 @@ def main():
             for line in blocks:
                 fl.write(line)
 
-        LOG("OUTPUT", output)
+        PySCLogs("[OUTPUT]", output)
 
         print("[DONE]")
         return

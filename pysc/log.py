@@ -1,6 +1,3 @@
-def LOG(type: str, message: str):
-    print(f"[{type}]:", message)
-
 def PySCLogs(*items: tuple[str], start: str = ''):
     """
     Improved version of LOG.
@@ -14,8 +11,8 @@ def PySCLogs(*items: tuple[str], start: str = ''):
 
     print(*items)
 
-def WARN(message: str, file: str, line: int):
-    print(f"[WARNING]: {file}, line {line}", message)
+def PySCWarns(message: str, file: str, line: int):
+    print(f"[WARNING] {file}, line {line}", message)
 
 class PySCFileException(Exception):
     pass

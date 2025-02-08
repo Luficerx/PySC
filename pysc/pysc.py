@@ -71,7 +71,7 @@ def PySCParseBlocks(file_name: str) -> Any:
                     skip = False
 
                 if PySCComment(PySCOpenComment, line):
-                    WARN(f"'<#' Found in line {i} inside a comment section, Did you forget to close the previous comment block?", file_name, i)
+                    PySCWarns(f"'<#' Found in line {i} while inside a comment section, Did you forget to close the previous comment block?", file_name, i)
 
                 continue
 
@@ -88,7 +88,7 @@ def PySCParseBlocks(file_name: str) -> Any:
     return blocks
 
 def PySCOpen(file_name: str) -> list[Any]:
-    LOG("PARSING", file_name)
+    PySCLogs("[PARSING]", file_name)
     PySCHandleInputFile(file_name)
     blocks = PySCParseBlocks(file_name)
     return blocks

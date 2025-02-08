@@ -1,4 +1,3 @@
-
 PySCOpenDelims = {'{', '(', '['}
 PySCCloseDelims = {'}', ')', ']'}
 
